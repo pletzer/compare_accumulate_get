@@ -18,6 +18,8 @@ include_directories(
   ${MPI_CXX_INCLUDE_PATH}
 )
 
+configure_file(run_mpi_sum_compare.sl.in run_mpi_sum_compare.sl)
+
 # Define the executable
 add_executable(mpi_sum_compare mpi_sum_compare.cpp)
 
