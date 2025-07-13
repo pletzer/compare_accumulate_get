@@ -3,6 +3,7 @@
 #include <vector>
 #include <numeric>
 #include <cstdlib>
+#include <fstream>
 
 int main(int argc, char** argv) {
     MPI_Init(&argc, &argv);
@@ -19,8 +20,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    std::ofstream csvfile;
     if (rank == 0) {
-        std::cout << "method,data_size,time_sec,result_sum\n";
+	csvfile.open("timings.csv");
+        csvfile << "method,data_size,time_sec,result_sum\n";
     }
 
     for (int i = 1; i < argc; ++i) {
@@ -52,7 +55,7 @@ int main(int argc, char** argv) {
                 result_accumulate[j] += local_data[j];  // add own value
             }
             double sum = std::accumulate(result_accumulate.begin(), result_accumulate.end(), 0.0);
-            std::cout << "accumulate," << data_size << "," << (end_acc - start_acc) << "," << sum << "\n";
+            csvfile << "accumulate," << data_size << "," << (end_acc - start_acc) << "," << sum << "\n";
         }
 
         MPI_Win_free(&win_acc);
@@ -77,7 +80,7 @@ int main(int argc, char** argv) {
 
         if (rank == 0) {
             double sum = std::accumulate(gathered.begin(), gathered.end(), 0.0);
-            std::cout << "get," << data_size << "," << (end_get - start_get) << "," << sum << "\n";
+            csvfile << "get," << data_size << "," << (end_get - start_get) << "," << sum << "\n";
         }
 
         MPI_Win_free(&win_get);
